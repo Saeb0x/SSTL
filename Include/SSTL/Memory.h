@@ -3,7 +3,7 @@
 
 #include "Types.h"
 
-namespace SSTL
+namespace sstl
 {
     constexpr uint64 Kilobytes = 1024;
     constexpr uint64 Megabytes = Kilobytes * 1024;

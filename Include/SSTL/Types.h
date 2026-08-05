@@ -18,6 +18,9 @@ namespace sstl
     using real32 = float;
     using real64 = double;
 
+    using bool8 = uint8;
+    using bool32 = uint32;
+
     using byte = uint8;
     using handle = uint32;
 }

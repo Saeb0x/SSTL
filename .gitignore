@@ -1,5 +1,9 @@
 # Directories
 Build/
+Src/
+
+# Build
+*.bat
 
 # Emacs
 *~

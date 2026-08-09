@@ -2,6 +2,7 @@
 #define SSTL_TYPES_H
 
 #include <cstdint>
+#include <cstddef>
 
 namespace sstl
 {
@@ -23,6 +24,9 @@ namespace sstl
 
     using byte = uint8;
     using handle = uint32;
+
+    using usize = std::size_t;
+    using isize = std::ptrdiff_t;
 }
 
 #endif

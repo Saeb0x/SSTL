@@ -1,8 +1,11 @@
 #if !defined(SSTL_TYPES_H)
 #define SSTL_TYPES_H
 
-#include <cstdint>
+#include <climits>
 #include <cstddef>
+#include <cstdint>
+
+static_assert(CHAR_BIT == 8, "SSTL assumes 8-bit bytes so that char8 (an alias for char) is actually fixed-width.");
 
 namespace sstl
 {
@@ -21,6 +24,14 @@ namespace sstl
 
     using bool8 = uint8;
     using bool32 = uint32;
+
+    using char8 = char;
+    using char16 = char16_t;
+    using char32 = char32_t;
+
+    using cstring8 = const char8*;
+    using cstring16 = const char16*;
+    using cstring32 = const char32*;
 
     using byte = uint8;
     using handle = uint32;

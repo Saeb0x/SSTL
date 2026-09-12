@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 
-static_assert(CHAR_BIT == 8, "SSTL assumes 8-bit bytes so that char8 (an alias for char) is actually fixed-width.");
+static_assert(CHAR_BIT == 8, "SSTL requires 8-bit bytes.");
 
 namespace sstl
 {

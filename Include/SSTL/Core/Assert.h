@@ -18,35 +18,32 @@
     extern "C" __declspec(dllimport) void __stdcall DebugBreak(void);
 #endif
 
-namespace sstl
-{
-    using AssertHandler = void(*)(const char* expression, const char* file, int32 line, const char* message);
+using AssertHandler = void(*)(const char* expression, const char* file, int32 line, const char* message);
 
 #if SSTL_DEFAULT_ASSERT_HANDLER
-    inline void DefaultAssertHandler(const char* expression, const char* file, int32 line, const char* message)
+inline void DefaultAssertHandler(const char* expression, const char* file, int32 line, const char* message)
+{
+    std::fprintf(stderr, "SSTL: Assertion failed:\n    Expression: %s.\n    At: %s:%d.\n", expression, file, line);
+
+    if(message != nullptr)
     {
-        std::fprintf(stderr, "SSTL: Assertion failed:\n    Expression: %s.\n    At: %s:%d.\n", expression, file, line);
-
-        if(message != nullptr)
-        {
-            std::fprintf(stderr, "    Message: %s.\n", message);
-        }
-
-#if SSTL_PLATFORM_WINDOWS
-        if(IsDebuggerPresent())
-        {
-            DebugBreak();
-        }
-#endif
-
-        std::abort();
+        std::fprintf(stderr, "    Message: %s.\n", message);
     }
 
-    inline AssertHandler g_AssertHandler = &DefaultAssertHandler;
-#else
-    inline AssertHandler g_AssertHandler = nullptr;
+#if SSTL_PLATFORM_WINDOWS
+    if(IsDebuggerPresent())
+    {
+        DebugBreak();
+    }
 #endif
+
+    std::abort();
 }
+
+inline AssertHandler g_AssertHandler = &DefaultAssertHandler;
+#else
+inline AssertHandler g_AssertHandler = nullptr;
+#endif
 
 #if SSTL_DEBUG
 #define SSTL_ASSERT_MSG(expression, message) \
@@ -54,7 +51,7 @@ namespace sstl
     { \
         if (!(expression)) \
         { \
-            sstl::g_AssertHandler(#expression, __FILE__, __LINE__, (message)); \
+            g_AssertHandler(#expression, __FILE__, __LINE__, (message)); \
         } \
     } while (0)
 #else
@@ -66,6 +63,6 @@ namespace sstl
 #define SSTL_ASSERT_STATIC(expression) static_assert(expression)
 
 // NOTE(saeb): Unconditional failure.
-#define SSTL_FAIL_MSG(message) (sstl::g_AssertHandler("SSTL_FAIL", __FILE__, __LINE__, (message)))
+#define SSTL_FAIL_MSG(message) (g_AssertHandler("SSTL_FAIL", __FILE__, __LINE__, (message)))
 
 #endif

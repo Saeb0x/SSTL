@@ -1,23 +1,6 @@
 #if !defined(SSTL_CONFIG_H)
 #define SSTL_CONFIG_H
 
-// SECTION(saeb): Compiler detection.
-#define SSTL_COMPILER_CLANG 0
-#define SSTL_COMPILER_MSVC 0
-#define SSTL_COMPILER_GNU 0
-
-#if defined(__clang__)
-    #undef SSTL_COMPILER_CLANG
-    #define SSTL_COMPILER_CLANG 1
-#elif defined(_MSC_VER)
-    #undef SSTL_COMPILER_MSVC
-    #define SSTL_COMPILER_MSVC 1
-#elif defined(__GNUC__)
-    #undef SSTL_COMPILER_GNU
-    #define SSTL_COMPILER_GNU 1
-#endif
-
-// SECTION(saeb): Platform detection.
 #define SSTL_PLATFORM_WINDOWS 0
 #define SSTL_PLATFORM_LINUX 0
 #define SSTL_PLATFORM_APPLE 0
@@ -33,7 +16,6 @@
     #define SSTL_PLATFORM_APPLE 1
 #endif
 
-// SECTION(saeb): Debug/Release detection.
 #if defined(SSTL_DEBUG) && !defined(SSTL_RELEASE)
     #define SSTL_RELEASE (!(SSTL_DEBUG))
 #elif defined(SSTL_RELEASE) && !defined(SSTL_DEBUG)
@@ -52,7 +34,6 @@
     #error "SSTL: Exactly one of SSTL_DEBUG / SSTL_RELEASE must be 1."
 #endif
 
-// SECTION(saeb): Exception detection.
 #if !defined(SSTL_EXCEPTIONS_ENABLED)
     #if defined(_CPPUNWIND) || defined(__EXCEPTIONS) || defined(__cpp_exceptions)
         #define SSTL_EXCEPTIONS_ENABLED 1

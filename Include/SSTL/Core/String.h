@@ -152,9 +152,38 @@ inline String8 String8FromView(StackAllocator* allocator, StringView8 view)
     return String8{ data, view.Length, view.Length + 1 };
 }
 
+inline String16 String16FromView(StackAllocator* allocator, StringView16 view)
+{
+    if(!allocator || view.Length == 0)
+    {
+        return String16{ nullptr, 0, 0 };
+    }
+
+    // Allocate with null terminator.
+    char16* data = (char16*)Allocate(allocator, Heap::Lower, view.Length + 1, alignof(char16));
+    if(!data)
+    {
+        return String16{ nullptr, 0, 0 };
+    }
+
+    // Copy data.
+    for(usize i = 0; i < view.Length; i++)
+    {
+        data[i] = view.Data[i];
+    }
+    data[view.Length] = '\0';
+
+    return String16{ data, view.Length, view.Length + 1 };
+}
+
 inline String8 String8FromLiteral(StackAllocator* allocator, const char8* literal)
 {
     return String8FromView(allocator, SV8(literal));
+}
+
+inline String16 String16FromLiteral(StackAllocator* allocator, const char16* literal)
+{
+    return String16FromView(allocator, SV16(literal));
 }
 
 inline String8 String8Reserve(StackAllocator* allocator, usize capacity)

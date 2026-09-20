@@ -120,7 +120,7 @@ inline StringView16 SV8ToSV16(StackAllocator* allocator, StringView8 view)
     }
 
     usize bufferCapacity = SV8ToSV16Length(view) + 1;
-    char16* buffer = (char16*)Allocate(allocator, Heap::Lower, bufferCapacity * sizeof(char16), alignof(char16));
+    char16* buffer = (char16*)Allocate(allocator, Heap::Upper, bufferCapacity * sizeof(char16), alignof(char16));
     if(!buffer)
     {
         return StringView16{ nullptr, 0 };

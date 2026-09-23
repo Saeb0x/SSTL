@@ -4,7 +4,8 @@
 #include "SSTL/Core/Config.h"
 #include "SSTL/Core/Types.h"
 
-#define SSTL_ALIGNUP(address, alignmentBytes) ((((usize)(address)) + (alignmentBytes) - 1) & (~((alignmentBytes) - 1)))
+#define SSTL_ALIGNUP(address, alignmentBytes) ((((usize)(address)) + ((usize)(alignmentBytes)) - 1) & (~(((usize)(alignmentBytes)) - 1)))
+#define SSTL_ALIGNDOWN(address, alignmentBytes) ((((usize)(address))) & (~(((usize)(alignmentBytes)) - 1)))
 
 struct StackAllocator
 {
@@ -36,7 +37,7 @@ void ShutdownStackAllocator(StackAllocator* allocator);
     #error "SSTL: Unsupported platform for StackAllocator."
 #endif
 
-inline void* Allocate(StackAllocator* allocator, Heap heap, usize size, uint8 alignment)
+inline void* Allocate(StackAllocator* allocator, Heap heap, usize size, usize alignment)
 {
     if(!allocator || size == 0 || alignment == 0)
     {
@@ -49,35 +50,42 @@ inline void* Allocate(StackAllocator* allocator, Heap heap, usize size, uint8 al
         return nullptr;
     }
 
-    void* startingAddress;
+    usize lower = (usize)allocator->LowerHeap;
+    usize upper = (usize)allocator->UpperHeap;
+
+    void* memory;
     if(heap == Heap::Upper)
     {
         // From upper heap (down).
-        usize aligned = SSTL_ALIGNUP((usize)(allocator->UpperHeap - size), alignment);
-
-        if(aligned < (usize)allocator->LowerHeap)
+        if(size > upper - lower)
         {
-            return nullptr; // Out of memory or collision
+            return nullptr; // Out of memory
+        }
+
+        // NOTE(saeb): Growing down, so align down; aligning up would move back into memory already handed out.
+        usize aligned = SSTL_ALIGNDOWN(upper - size, alignment);
+        if(aligned < lower)
+        {
+            return nullptr; // Alignment padding collides with lower heap
         }
 
         allocator->UpperHeap = (uint8*)aligned;
-        startingAddress = (void*)aligned;
+        memory = (void*)aligned;
     }
     else
     {
         // From lower heap (up).
-        usize aligned = SSTL_ALIGNUP((usize)allocator->LowerHeap, alignment);
-
-        if(aligned + size > (usize)allocator->UpperHeap)
+        usize aligned = SSTL_ALIGNUP(lower, alignment);
+        if(aligned > upper || size > upper - aligned)
         {
             return nullptr; // Out of memory or collision
         }
 
         allocator->LowerHeap = (uint8*)(aligned + size);
-        startingAddress = (void*)aligned;
+        memory = (void*)aligned;
     }
 
-    return startingAddress;
+    return memory;
 }
 
 inline usize GetAvailableMemory(StackAllocator* allocator)
